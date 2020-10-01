@@ -1,22 +1,26 @@
 import csv
 
+#imnports csv and returns list
 def readCSV(source, index):
     l = []
     with open(source) as c:
         csv_reader = csv.reader(c, delimiter=',')
         for row in csv_reader:
             item = row[int(index)]
+            #if string has no @, it is not an email
             if item.count('@') > 0:
                 l.append(item.casefold())
     l.sort()
     return l
 
+#provides prompts for user
 def processCSV():
     source = input('Drag the .csv email list into the terminal: ')
     index = input('What row number are the emails in (the uconntact roster holds them in 4)?: ')
     source = source.replace(' ', '')
     return readCSV(source, index)
 
+#takes a string of emails and returns list of email strings
 def processSTR():
     s = input('Enter the string list (it will be split at commas): ')
     l = s.split(', ')
@@ -26,6 +30,7 @@ def processSTR():
             l[i] = l[i].casefold()
     return l
 
+#prompts differentiating string from csv
 def question(time):
     if time == 1:
         answer1 = input('Is the first list a string or a .csv? (s/c): ')
@@ -38,6 +43,7 @@ def question(time):
     else:
         return question(time)
 
+#main loop
 def run():
     input('Welcome to the email tool! (press anything to continue)')
     answer = ''
