@@ -1,26 +1,22 @@
 import csv
 
-#imnports csv and returns list
 def readCSV(source, index):
     l = []
     with open(source) as c:
         csv_reader = csv.reader(c, delimiter=',')
         for row in csv_reader:
             item = row[int(index)]
-            #if string has no @, it is not an email
             if item.count('@') > 0:
                 l.append(item.casefold())
     l.sort()
     return l
 
-#provides prompts for user
 def processCSV():
     source = input('Drag the .csv email list into the terminal: ')
     index = input('What row number are the emails in (the uconntact roster holds them in 4)?: ')
     source = source.replace(' ', '')
     return readCSV(source, index)
 
-#takes a string of emails and returns list of email strings
 def processSTR():
     s = input('Enter the string list (it will be split at commas): ')
     l = s.split(', ')
@@ -30,7 +26,6 @@ def processSTR():
             l[i] = l[i].casefold()
     return l
 
-#prompts differentiating string from csv
 def question(time):
     if time == 1:
         answer1 = input('Is the first list a string or a .csv? (s/c): ')
@@ -43,12 +38,11 @@ def question(time):
     else:
         return question(time)
 
-#main loop
 def run():
     input('Welcome to the email tool! (press anything to continue)')
     answer = ''
-    while answer != 'p' and answer != 'u':
-        answer = input('Would you like to print a .csv file, or find the union of two email lists (p/u)?')
+    while answer != 'p' and answer != 'u' and answer != 'e':
+        answer = input('Would you like to print .csv file, or find the union of two email lists (p/u/e)?')
     if answer == 'p':
         s = ''
         l = readCSV(input('Drag .csv file into terminal: '), input('Number of row to be printed: '))
@@ -56,7 +50,7 @@ def run():
             s = s + ', ' + l[i]
         s = l[0] + s
         print(s)
-    else:
+    elif answer == 'u':
         l1 = question(1)
         l2 = question(2)
         l1 = set(l1)
@@ -71,6 +65,7 @@ def run():
             a = input('Found ' + str(len(l)) + ' unique emails. Print or save as .csv? (p/c): ')
         if a == 'p':
             print('\nThe Combined List-\n' + s)
+            again()
         else:
             fileName = input("Enter the filename for the .csv (don't include .csv): ")
             fileName = fileName + '.csv'
@@ -81,5 +76,49 @@ def run():
                 for i in l:
                     writer.writerow([i])
             input('File created. Thanks for using the email tool!')
+            again()
+    else:
+        send = ''
+        while send != 'y' and send != 'n':
+            send = input('Send Email? (y/n) ')
+        if send == 'y':
+            import smtplib
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.text import MIMEText
+            from secrets import email, password
 
+
+            from_addr= email
+            subject = input('subject: ')
+            body = input('body: ')
+            recipients = input('to (if all, "all"): ')
+            if recipients == 'all':
+                recipients = l
+            else:
+                recipients = recipients.split(',')
+
+            mail = smtplib.SMTP('smtp.gmail.com',587)
+            mail.ehlo()
+            mail.starttls()
+            mail.login(email, password)
+            
+            for to_addr in recipients:
+                msg = MIMEMultipart()
+                msg['From']=from_addr
+                msg['To']=" ,".join(to_addr)
+                msg['subject']= subject
+
+                msg.attach(MIMEText(body,'plain'))
+
+                text = msg.as_string()
+                mail.sendmail(from_addr,to_addr,text)
+
+            mail.quit()
+            again()
+def again():
+    answer = ''
+    while answer != 'y' and answer != 'n':
+        answer = input('Sucess! Continue? (y/n): ')
+    if answer == 'y':
+        run()
 run()
